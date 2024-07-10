@@ -1,29 +1,31 @@
 import React from "react";
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { login as authLogin } from '../../store/authSlice'
+import { login as authLogin } from "../../store/authSlice.js";
 import { Button, Input, Logo } from "../index";
 import { useDispatch } from "react-redux";
+import authService from "../../Services/authService.js";
 import { useForm } from "react-hook-form";
-import axios from 'axios'
-import conf from "../../envConf/conf.js";
+
 function Login() {
     const navigate = useNavigate();
     const dispatch = useDispatch();
     const { register, handleSubmit } = useForm();
     const [error, setError] = useState("");
+
     const login = async (data) => {
         setError("");
-        console.log(data)
         try {
-            const session = await axios.post(`${conf.backendUserUrl}/login`,{email:data.email,password:data.password},{withCredentials:true}); // if session then user is logged in else not logged in
-            // console.log(userData)
+            const session = await authService.login(data); // if session then user is logged in else not logged in
+
             if (session) {
-                const userData = session.data.data
-                console.log(userData + " LOgin jsx")
-                dispatch(authLogin(userData))
-                navigate("/");
+                const userData = await authService.getCurrentUser();
+                if (userData) {
+                    console.log(userData)
+                    dispatch(authLogin(userData)); // sendin userdata in the context that is store
                 }
+                navigate("/");
+            }
         } catch (error) {
             setError(error.message);
         }

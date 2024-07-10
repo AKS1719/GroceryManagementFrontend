@@ -1,66 +1,62 @@
 import conf from '../envConf/conf.js'
 
+import { Client, Account, ID } from 'appwrite'
 
-class AuthService{
-    endpoint;
-    constructor(){
-        this.endpoint = conf.backendUrl
+
+export class AuthService {
+    client = new Client();
+    // we can create the authentication from the server here but it will be the waste of resource so when the object is created only then we need to complete the request
+    account;
+    constructor (){
+        this.client
+        .setEndpoint(conf.appwriteUrl)
+        .setProject(conf.projectId);
+
+        this.account= new Account(this.client)
     }
-    async createAccount({firstName,lastName,email,password,Number}){
+
+    async createAccount({name,email,password,number}){
         try {
-            console.log(this.endpoint)
-            const userAccount = await fetch(`/${this.endpoint}/users/register`,{
-                method:"POST",
-                headers:{
-                    'Content-Type':'application/json'
-                }  ,
-                body:JSON.stringify({firstName:firstName,lastName:lastName,email:email,password:password,Number:Number})
-            })
-            if(userAccount.ok){
+            const userAccount = await this.account.create(ID.unique(),email,password,name,number);
+            if(userAccount){
+                // call another method (if user exist then do the login )
                 return this.login({email,password})
             }
-            else return userAccount;
+            else{
+                return userAccount;
+            }
         } catch (error) {
-            throw new Error("Error creating account",error)
-        }
+            throw error;
+        }   
     }
 
     async login({email,password}){
-        console.log(this.endpoint)
         try {
-            return await fetch(`/${this.endpoint}/users/login`,{
-                method:"POST",
-                body:{email:email,password:password}
-            })
+            return await this.account.createEmailPasswordSession(email,password)            
         } catch (error) {
-            console.log("Service error :: login()",error.message)
-        }
-    }
-
-    async logout(){
-        try{
-            await fetch(`${this.endpoint}/users/logout`,{
-                method:"POST",
-            })
-        }
-        catch (error) {
-            console.log("Service error :: logout()",error.message)
+            throw error
         }
     }
 
     async getCurrentUser(){
-        try{
-            const user = await fetch(`${this.endpoint}/users/get-current-user`)
-            if(!user.ok)return null
-            return await user.json()
+        try {
+            return await this.account.get()
+        } catch (error) {
+            console.log("Appwrite Error :: getcurrent user : ",error)
         }
-        catch (error) {
-            console.log("Service error :: getCurrentUser()",error.message)
-        }
+        return null;
     }
 
+    async logout(){
+        try {
+            await this.account.deleteSessions()
+        } catch (error) {
+            console.log("logout : ",error)
+        }
+    }
 }
 
 const authService = new AuthService();
 
-export default authService;
+export default authService; 
+// export the auth Service object so that we don't need to create object in the other files

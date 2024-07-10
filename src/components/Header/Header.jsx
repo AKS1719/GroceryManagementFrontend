@@ -8,6 +8,7 @@ import {Link} from 'react-router-dom'
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import conf from "../../envConf/conf";
+import LogoutBtn from "../LogoutBtn";
 const menuItems = [
     {
         name: "Home",
@@ -54,12 +55,7 @@ export default function Header() {
                 <div className="hidden lg:block">
                     {authStatus ? 
                     (<>
-                        <button
-                        type="button"
-                        className="rounded-md mr-4 bg-black px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-black/80 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-black"
-                    >
-                        Logout
-                    </button>
+                        <LogoutBtn/>
                     </>)
                     : 
                     (<>
@@ -133,21 +129,28 @@ export default function Header() {
                                                 }}>Become Seller</span></>)}</span>
                                     </nav>
                                 </div>
-                                <button
+
                                 
-                                onClick={(e)=>{navigate('/login')}}
-                                    type="button"
-                                    className="mt-4 w-full rounded-md bg-black px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-black/80 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-black"
-                                >
-                                    Login
-                                </button>
-                                <button
-                                onClick={(e)=>{navigate('/signup')}}
-                                    type="button"
-                                    className="mt-4 w-full rounded-md bg-black px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-black/80 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-black"
-                                >
-                                    Sign up
-                                </button>
+                                {authStatus ? 
+                    (<>
+                        <LogoutBtn/>
+                    </>)
+                    : 
+                    (<>
+                    <button
+                        type="button"
+                        className="rounded-md mr-4 bg-black px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-black/80 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-black"
+                        onClick={(e)=>{navigate('/login')}}
+                    >
+                        Login
+                    </button>
+                    <button
+                        onClick={(e)=> navigate('/signup')}
+                        type="button"
+                        className="rounded-md bg-black px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-black/80 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-black"
+                    >
+                        Sign up
+                    </button></>)}
                             </div>
                         </div>
                     </div>

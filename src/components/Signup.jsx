@@ -5,8 +5,6 @@ import { Link, useNavigate } from "react-router-dom";
 import { login as authLogin } from "../store/authSlice.js";
 import { Button, Input, Logo } from "./index";
 import { useForm } from "react-hook-form";
-import axios from "axios";
-import conf from "../envConf/conf.js";
 
 function Signup() {
     const navigate = useNavigate();
@@ -18,10 +16,10 @@ function Signup() {
         setError("");
         console.log(data)
         try {
-            const userData = await axios.post(`${conf.backendUserUrl}/register`,{firstName:data.firstName, lastName:data.lastName, email:data.email, password:data.password,Number:data.
-                Number},{withCredentials:true});
+            const userData = await authService.createAccount(data);
             if (userData) {
-                console.log(userData)
+                const userData = await authService.getCurrentUser();
+                console.log(userData + "signup")
                 if (userData) dispatch(authLogin(userData));
                 navigate("/");
             }
@@ -59,26 +57,18 @@ function Signup() {
                 <form onSubmit={handleSubmit(createUser)}>
                     <div className="space-y-5">
                         <Input
-                            label="First Name"
+                            label="Name"
                             type="text"
-                            placeholder="Enter your first name"
-                            {...register("firstName", {
+                            placeholder="Enter your email"
+                            {...register("name", {
                                 required: true,
                             })}
                         />
                         <Input
-                            label="Last Name"
-                            type="text"
-                            placeholder="Enter your last name"
-                            {...register("lastName", {
-                                required: true,
-                            })}
-                        />
-                        <Input
-                            label="Number"
-                            type="number"
-                            placeholder="Enter your Mobile Number"
-                            {...register("Number", {
+                            label="Phone Number"
+                            type="tel"
+                            placeholder="Enter your email"
+                            {...register("number", {
                                 required: true,
                             })}
                         />
